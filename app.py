@@ -15,7 +15,7 @@ scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis
 try:
     creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
     client = gspread.authorize(creds)
-    sheet = client.open("Base_Datos_IESP").sheet1
+    sheet = client.open("ROL DE COMBATE").sheet1
 except:
     st.error("Error de conexión. Revisa los Secrets y el nombre del Excel.")
 
