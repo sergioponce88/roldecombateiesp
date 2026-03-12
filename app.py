@@ -15,7 +15,7 @@ client = gspread.authorize(creds)
 
 # Cambia esto por el nombre EXACTO de tu archivo en Google Drive
 NOMBRE_EXCEL = "Base_Datos_IESP" 
-sheet = client.open(NOMBRE_EXCEL).sheet1
+sheet = client.open(ROL DE COMBATE).sheet1
 
 st.set_page_config(page_title="Sistema de Sanciones I.E.S.P.", layout="wide")
 st.title("👮 Sistema de Registro Disciplinario - I.E.S.P.")
