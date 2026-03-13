@@ -58,6 +58,16 @@ with tab1:
         cp = st.text_input("Código Postal")
         mano_habil = st.selectbox("Mano Hábil", ["DIESTRO", "ZURDO", "AMBIDIESTRO"])
 
+    # REDES SOCIALES (NUEVO REQUISITO D.G.I.I.)
+    st.markdown("##### 🌐 Redes Sociales (Requisito D.G.I.I.)")
+    col_redes1, col_redes2 = st.columns(2)
+    with col_redes1:
+        ig_user = st.text_input("Instagram (Usuario)").lower()
+        fb_user = st.text_input("Facebook (Usuario)").lower()
+    with col_redes2:
+        tw_user = st.text_input("X / Twitter (Usuario)").lower()
+        otras_redes = st.text_input("Otras Redes (TikTok, etc.)").lower()
+
     st.markdown("##### Biometría")
     cb1, cb2, cb3 = st.columns(3)
     with cb1:
@@ -90,7 +100,7 @@ with tab2:
     st.markdown("##### Situación Habitacional y Conducción")
     ch1, ch2 = st.columns(2)
     with ch1:
-        convive = st.text_input("¿Con quién vive?").upper()
+        convive_txt = st.text_input("¿Con quién vive? (Resumen)").upper()
         alquila = st.selectbox("¿Alquila?", ["NO", "SI"])
         aviso_emerg = st.text_input("Avisar en caso de Emergencia a:").upper()
         tel_emerg = st.text_input("Teléfono de Emergencia")
@@ -106,7 +116,7 @@ with tab2:
     with cl_apt[1]:
         sabe_cabalgar = st.radio("¿Sabe Cabalgar?", ["SI", "NO"], horizontal=True)
 
-# --- TAB 3: SALUD (ACTUALIZADA) ---
+# --- TAB 3: SALUD ---
 with tab3:
     st.subheader("Monitor Clínico y Antecedentes Médicos")
     
@@ -137,8 +147,8 @@ with tab3:
             dict_trauma[z] = f"{tuvo} ({fec})"
         relato_trauma = st.text_area("Relato del hecho de la lesión").upper()
 
-    with st.expander("🧬 Antecedentes Familiares (Padre, Madre, Abuelos, Hermanos)"):
-        ant_fam_txt = st.text_area("Detalle enfermedades familiares (Diabetes, HT, etc.)").upper()
+    with st.expander("🧬 Antecedentes Familiares"):
+        ant_fam_txt = st.text_area("Detalle enfermedades familiares (Padre, Madre, Abuelos, Hermanos)").upper()
 
     with st.expander("🚬 Hábitos y Otros"):
         hab_c1, hab_c2 = st.columns(2)
@@ -151,35 +161,52 @@ with tab3:
         internaciones = st.text_area("Internaciones previas").upper()
         condicion_especial = st.text_area("¿Condición que interfiera con la función?").upper()
 
-# --- TAB 4: FAMILIA (HERMANOS E HIJOS) ---
+# --- TAB 4: FAMILIA Y CONVIVIENTES (NUEVO REQUISITO D.G.I.I.) ---
 with tab4:
-    st.subheader("Grupo Familiar Directo")
+    st.subheader("Datos Familiares y Grupo Conviviente")
     
-    st.markdown("#### 👤 Hermanos (Cargar hasta 5)")
+    # 1. PROGENITORES (NUEVO)
+    st.markdown("#### 👨‍👩‍👦 Progenitores (Padre y Madre)")
+    for pariente in ["PADRE", "MADRE"]:
+        with st.expander(f"Datos de la {pariente}"):
+            cp1, cp2 = st.columns(2)
+            with cp1:
+                st.selectbox(f"¿Vive? ({pariente})", ["SI", "NO"], key=f"v_{pariente}")
+                st.text_input(f"Nombre Completo ({pariente})", key=f"n_{pariente}").upper()
+            with cp2:
+                st.text_input(f"DNI ({pariente})", key=f"d_{pariente}")
+                st.text_input(f"Celular ({pariente})", key=f"c_{pariente}")
+
+    # 2. HERMANOS
+    st.markdown("#### 👤 Hermanos (Hasta 5)")
     datos_hermanos = []
     for i in range(1, 6):
         with st.expander(f"Hermano N° {i}"):
             h_c1, h_c2 = st.columns(2)
-            h_vive = h_c1.selectbox(f"¿Vive? (H{i})", ["SI", "NO"], key=f"h_v{i}")
-            h_nom = h_c1.text_input(f"Nombre (H{i})", key=f"h_n{i}").upper()
-            h_dni = h_c1.text_input(f"DNI (H{i})", key=f"h_d{i}")
-            h_cuil = h_c2.text_input(f"CUIL (H{i})", key=f"h_c{i}")
-            h_fnac = h_c2.date_input(f"F. Nac (H{i})", value=date(2000,1,1), key=f"h_f{i}")
-            h_cel = h_c2.text_input(f"Celular (H{i})", key=f"h_t{i}")
-            datos_hermanos.append(f"H{i}: {h_nom}-{h_dni}")
+            with h_c1:
+                h_v = st.selectbox(f"¿Vive? (H{i})", ["SI", "NO"], key=f"hv_{i}")
+                h_n = st.text_input(f"Nombre (H{i})", key=f"hn_{i}").upper()
+                h_d = st.text_input(f"DNI (H{i})", key=f"hd_{i}")
+            with h_c2:
+                h_c = st.text_input(f"CUIL (H{i})", key=f"hc_{i}")
+                h_f = st.date_input(f"F. Nac (H{i})", value=date(2000,1,1), key=f"hf_{i}")
+                h_t = st.text_input(f"Celular (H{i})", key=f"ht_{i}")
+            datos_hermanos.append(f"H{i}:{h_n}")
 
-    st.markdown("#### 👶 Hijos (Cargar hasta 5)")
-    datos_hijos = []
+    # 3. GRUPO CONVIVIENTE (NUEVO)
+    st.markdown("#### 🏠 Grupo Conviviente (Personas que viven con usted)")
+    datos_convivientes = []
     for i in range(1, 6):
-        with st.expander(f"Hijo N° {i}"):
-            hij_c1, hij_c2 = st.columns(2)
-            hij_vive = hij_c1.selectbox(f"¿Vive? (Hijo {i})", ["SI", "NO"], key=f"hij_v{i}")
-            hij_nom = hij_c1.text_input(f"Nombre (Hijo {i})", key=f"hij_n{i}").upper()
-            hij_dni = hij_c1.text_input(f"DNI (Hijo {i})", key=f"hij_d{i}")
-            hij_cuil = hij_c2.text_input(f"CUIL (Hijo {i})", key=f"hij_c{i}")
-            hij_fnac = hij_c2.date_input(f"F. Nac (Hijo {i})", value=date(2010,1,1), key=f"hij_f{i}")
-            hij_cel = hij_c2.text_input(f"Celular (Hijo {i})", key=f"hij_t{i}")
-            datos_hijos.append(f"Hijo{i}: {hij_nom}-{hij_dni}")
+        with st.expander(f"Conviviente N° {i}"):
+            cv1, cv2 = st.columns(2)
+            with cv1:
+                c_p = st.text_input(f"Parentesco (C{i})", key=f"cp_{i}").upper()
+                c_n = st.text_input(f"Nombre (C{i})", key=f"cn_{i}").upper()
+            with cv2:
+                c_d = st.text_input(f"DNI (C{i})", key=f"cd_{i}")
+                c_e = st.number_input(f"Edad (C{i})", 0, 100, 20, key=f"ce_{i}")
+                c_t = st.text_input(f"Celular (C{i})", key=f"ct_{i}")
+            datos_convivientes.append(f"C{i}:{c_n}({c_p})")
 
 # --- TAB 5 Y 6 (FORMACIÓN Y PROFESIONAL) ---
 with tab5:
@@ -188,34 +215,42 @@ with tab5:
     cursos_ext = st.text_area("Otros Cursos").upper()
 
 with tab6:
-    st.subheader("Trabajo y Accidentes")
+    st.subheader("Situación Profesional y Armamento")
     cp_c1, cp_c2 = st.columns(2)
     otro_trabajo = cp_c1.selectbox("¿Tiene otro trabajo?", ["NO", "SI"])
     tipo_trabajo = cp_c1.text_input("¿Qué tipo?").upper()
     tuvo_accidente = cp_c2.selectbox("¿Tuvo accidente?", ["NO", "SI"])
-    det_accidente = cp_c2.text_input("¿De qué tipo? (Tránsito/Trabajo)").upper()
+    det_accidente = cp_c2.text_input("¿De qué tipo?").upper()
     st.markdown("---")
     jerarquia = st.selectbox("Jerarquía Actual", ["CADETE", "CABO C.", "SARGENTO C."])
     arm_prov_m = st.text_input("Arma Marca").upper()
     arm_prov_s = st.text_input("Arma Serie")
 
-# --- BOTÓN DE CARGA ---
+# --- BOTÓN DE CARGA Y DECLARACIÓN JURADA ---
+st.markdown("---")
+st.warning("⚠️ **DECLARACIÓN JURADA:** Declaro bajo juramento que los datos consignados son verídicos y me hago responsable ante cualquier inconveniente. La falsedad de lo declarado será sujeto a medidas legales pertinente.")
+acepto_legales = st.checkbox("Confirmo que los datos ingresados son verídicos.")
+
 if st.button("🚀 REGISTRAR LEGAJO COMPLETO"):
-    if apellido and nombre and dni:
-        try:
-            # Consolidamos síntomas y traumas en strings para no saturar columnas del excel
-            string_enf = ", ".join([f"{k}:{v}" for k, v in dict_enf.items() if v == "SI"])
-            string_trauma = ", ".join([f"{k}:{v}" for k, v in dict_trauma.items() if "SI" in v])
-            
-            fila = [
-                str(date.today()), apellido, nombre, dni, cuil, str(f_nac), edad, sexo, 
-                anio_cursa, ur_destino, localidad_res, domicilio_perm, cel_particular, 
-                string_enf, string_trauma, relato_trauma, ant_fam_txt, tabaco, alcohol, 
-                act_fisica, dieta, str(datos_hermanos), str(datos_hijos), niv_alcanzado, 
-                titulo_obt, otro_trabajo, tuvo_accidente, jerarquia, arm_prov_m, arm_prov_s
-            ]
-            sheet.append_row(fila)
-            st.success("✅ Legajo guardado con éxito.")
-            st.balloons()
-        except Exception as e:
-            st.error(f"Error: {e}")
+    if acepto_legales:
+        if apellido and nombre and dni:
+            try:
+                string_enf = ", ".join([f"{k}:{v}" for k, v in dict_enf.items() if v == "SI"])
+                string_trauma = ", ".join([f"{k}:{v}" for k, v in dict_trauma.items() if "SI" in v])
+                
+                fila = [
+                    str(date.today()), apellido, nombre, dni, cuil, str(f_nac), edad, sexo, 
+                    anio_cursa, ur_destino, localidad_res, domicilio_perm, cel_particular, 
+                    ig_user, fb_user, tw_user, str(datos_hermanos), str(datos_convivientes),
+                    string_enf, string_trauma, relato_trauma, ant_fam_txt, tabaco, alcohol, 
+                    act_fisica, dieta, niv_alcanzado, titulo_obt, otro_trabajo, jerarquia, arm_prov_m
+                ]
+                sheet.append_row(fila)
+                st.success("✅ Legajo guardado con éxito bajo juramento.")
+                st.balloons()
+            except Exception as e:
+                st.error(f"Error: {e}")
+        else:
+            st.warning("⚠️ Apellido, Nombre y DNI son obligatorios.")
+    else:
+        st.error("❌ Debe aceptar la declaración jurada para registrar los datos.")
