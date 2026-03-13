@@ -58,15 +58,15 @@ with tab1:
         cp = st.text_input("Código Postal")
         mano_habil = st.selectbox("Mano Hábil", ["DIESTRO", "ZURDO", "AMBIDIESTRO"])
 
-    # REDES SOCIALES (NUEVO REQUISITO D.G.I.I.)
+    # REDES SOCIALES (ACTUALIZADO: TikTok por Twitter)
     st.markdown("##### 🌐 Redes Sociales (Requisito D.G.I.I.)")
     col_redes1, col_redes2 = st.columns(2)
     with col_redes1:
         ig_user = st.text_input("Instagram (Usuario)").lower()
         fb_user = st.text_input("Facebook (Usuario)").lower()
     with col_redes2:
-        tw_user = st.text_input("X / Twitter (Usuario)").lower()
-        otras_redes = st.text_input("Otras Redes (TikTok, etc.)").lower()
+        tk_user = st.text_input("TikTok (Usuario)").lower()  # <-- CAMBIO AQUÍ
+        otras_redes = st.text_input("Otras Redes").lower()
 
     st.markdown("##### Biometría")
     cb1, cb2, cb3 = st.columns(3)
@@ -161,11 +161,10 @@ with tab3:
         internaciones = st.text_area("Internaciones previas").upper()
         condicion_especial = st.text_area("¿Condición que interfiera con la función?").upper()
 
-# --- TAB 4: FAMILIA Y CONVIVIENTES (NUEVO REQUISITO D.G.I.I.) ---
+# --- TAB 4: FAMILIA Y CONVIVIENTES ---
 with tab4:
     st.subheader("Datos Familiares y Grupo Conviviente")
     
-    # 1. PROGENITORES (NUEVO)
     st.markdown("#### 👨‍👩‍👦 Progenitores (Padre y Madre)")
     for pariente in ["PADRE", "MADRE"]:
         with st.expander(f"Datos de la {pariente}"):
@@ -177,7 +176,6 @@ with tab4:
                 st.text_input(f"DNI ({pariente})", key=f"d_{pariente}")
                 st.text_input(f"Celular ({pariente})", key=f"c_{pariente}")
 
-    # 2. HERMANOS
     st.markdown("#### 👤 Hermanos (Hasta 5)")
     datos_hermanos = []
     for i in range(1, 6):
@@ -193,8 +191,7 @@ with tab4:
                 h_t = st.text_input(f"Celular (H{i})", key=f"ht_{i}")
             datos_hermanos.append(f"H{i}:{h_n}")
 
-    # 3. GRUPO CONVIVIENTE (NUEVO)
-    st.markdown("#### 🏠 Grupo Conviviente (Personas que viven con usted)")
+    st.markdown("#### 🏠 Grupo Conviviente")
     datos_convivientes = []
     for i in range(1, 6):
         with st.expander(f"Conviviente N° {i}"):
@@ -241,7 +238,7 @@ if st.button("🚀 REGISTRAR LEGAJO COMPLETO"):
                 fila = [
                     str(date.today()), apellido, nombre, dni, cuil, str(f_nac), edad, sexo, 
                     anio_cursa, ur_destino, localidad_res, domicilio_perm, cel_particular, 
-                    ig_user, fb_user, tw_user, str(datos_hermanos), str(datos_convivientes),
+                    ig_user, fb_user, tk_user, str(datos_hermanos), str(datos_convivientes), # <-- GUARDANDO tk_user
                     string_enf, string_trauma, relato_trauma, ant_fam_txt, tabaco, alcohol, 
                     act_fisica, dieta, niv_alcanzado, titulo_obt, otro_trabajo, jerarquia, arm_prov_m
                 ]
