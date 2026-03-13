@@ -55,7 +55,6 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 with tab1:
     st.subheader("Fotografía Oficial y Datos Filiatorios")
     
-    # REQUISITO DE FOTO (GALA DE VERANO)
     st.warning("📸 **REQUISITO DE FOTOGRAFÍA:** La imagen debe ser del cadete vistiendo **GALA DE VERANO** con todos sus atributos reglamentarios.")
     foto_perfil = st.file_uploader("Cargar fotografía oficial (Formato JPG/PNG)", type=['jpg', 'png', 'jpeg'])
     
@@ -112,7 +111,7 @@ with tab1:
         rh = st.selectbox("Factor RH", ["POSITIVO (+)", "NEGATIVO (-)"])
     senias = st.text_area("Señas Particulares").upper()
 
-# --- TAB 2: LOCALIZACIÓN Y LOGÍSTICA ---
+# --- TAB 2: LOCALIZACIÓN ---
 with tab2:
     st.subheader("Residencia y Contacto")
     cl1, cl2 = st.columns(2)
@@ -139,6 +138,12 @@ with tab2:
         que_conduce = st.text_input("¿Qué Conduce?").upper()
         carnet = st.selectbox("¿Posee Carnet?", ["SI", "NO"])
         clase_carnet = st.text_input("Clase de Licencia").upper()
+
+    cl_apt = st.columns(2)
+    with cl_apt[0]:
+        sabe_nadar = st.radio("¿Sabe Nadar?", ["SI", "NO"], horizontal=True)
+    with cl_apt[1]:
+        sabe_cabalgar = st.radio("¿Sabe Cabalgar?", ["SI", "NO"], horizontal=True)
 
 # --- TAB 3: SALUD ---
 with tab3:
@@ -195,7 +200,7 @@ with tab4:
 
 # --- TAB 5 Y 6 ---
 with tab5:
-    niv_alcanzado = st.selectbox("Nivel Académico", ["SECUNDARIO", "TERCIARIO", "UNIVERSITARIO"])
+    niv_alcanzado = st.selectbox("Máximo Nivel Alcanzado", ["SECUNDARIO", "TERCIARIO", "UNIVERSITARIO"])
     titulo_obt = st.text_input("Título Obtenido").upper()
 
 with tab6:
@@ -205,7 +210,7 @@ with tab6:
     arm_prov_m = st.text_input("Arma Marca").upper()
     arm_prov_s = st.text_input("Arma Serie")
 
-# --- BOTÓN DE REGISTRO FINAL (43 CAMPOS) ---
+# --- BOTÓN DE REGISTRO FINAL (Alineado con tus 45 columnas) ---
 st.markdown("---")
 st.warning("⚠️ **DECLARACIÓN JURADA:** Declaro bajo juramento que los datos consignados son verídicos.")
 acepto_legales = st.checkbox("Confirmo que los datos ingresados son verídicos.")
@@ -214,31 +219,41 @@ if st.button("🚀 REGISTRAR LEGAJO COMPLETO"):
     if acepto_legales and apellido and nombre and dni:
         with st.spinner("Procesando y subiendo legajo..."):
             try:
-                # Subida de foto a Drive
-                url_foto = subir_foto_drive(foto_perfil, f"{apellido}_{nombre}") if foto_perfil else "Sin Foto"
+                # 1. Subida de foto a Drive
+                url_foto = "Sin Foto"
+                if foto_perfil:
+                    url_foto = subir_foto_drive(foto_perfil, f"{apellido}_{nombre}")
 
-                # Consolidación de datos complejos
+                # 2. Consolidación de datos complejos
                 string_enf = ", ".join([f"{k}" for k, v in dict_enf.items() if v == "SI"])
                 string_trauma = ", ".join([f"{k}:{v}" for k, v in dict_trauma.items() if "SI" in v])
                 
-                # FILA SEGÚN TU ORDEN EXACTO (A-AQ)
+                # 3. CONSTRUCCIÓN DE LA FILA (45 COLUMNAS EXACTAS SEGÚN TU EXCEL)
                 fila = [
-                    str(date.today()), apellido, nombre, dni, cuil, str(f_nac), # A-F
-                    edad, sexo, est_civil, legajo_lp, prontuario, anio_cursa,   # G-L
-                    estatura, peso, imc, estado_imc, f"{gs} {rh}",             # M-Q
-                    ur_destino, localidad_res, departamento, domicilio_perm,   # R-U
-                    comisaria_jur, cel_particular, ig_user, fb_user, tk_user,  # V-Z
-                    str(datos_hermanos), str(datos_convivientes),              # AA-AB
-                    string_enf, string_trauma, relato_trauma, ant_fam_txt,     # AC-AF
-                    tabaco, alcohol, act_fisica, dieta, niv_alcanzado,         # AG-AK
-                    titulo_obt, otro_trabajo, jerarquia, arm_prov_m,           # AL-AP
-                    arm_prov_s, url_foto                                       # AQ-AR
+                    str(date.today()), apellido, nombre, dni, cuil, str(f_nac), # A-F (0-5)
+                    edad, sexo, est_civil, legajo_lp, prontuario, anio_cursa,   # G-L (6-11)
+                    "-",           # M (12) - Relleno para la columna 'Cursa' detectada
+                    estatura, peso, imc, estado_imc, f"{gs} {rh}",             # N-R (13-17)
+                    ur_destino, localidad_res, departamento, domicilio_perm,   # S-V (18-21)
+                    comisaria_jur, cel_particular,                             # W-X (22-23)
+                    ig_user, fb_user, tk_user,                                 # Y-AA (24-26)
+                    str(datos_hermanos), str(datos_convivientes),              # AB-AC (27-28)
+                    string_enf, string_trauma, relato_trauma, ant_fam_txt,     # AD-AG (29-32)
+                    tabaco, alcohol, act_fisica, dieta, niv_alcanzado,         # AH-AL (33-37)
+                    titulo_obt,    # AM (38)
+                    otro_trabajo,  # AN (39)
+                    "",            # AO (40) - Relleno para la columna 'Trabajo' detectada
+                    jerarquia,     # AP (41)
+                    arm_prov_m, arm_prov_s, # AQ-AR (42-43)
+                    url_foto       # AS (44) - Link de la foto al final
                 ]
                 
+                # 4. Envío a Google Sheets
                 sheet.append_row(fila)
-                st.success(f"✅ Legajo de {nombre} {apellido} guardado con éxito.")
+                st.success(f"✅ ¡Excelente! El legajo de {nombre} {apellido} se guardó correctamente.")
                 st.balloons()
+                
             except Exception as e:
-                st.error(f"Error técnico: {e}")
+                st.error(f"Error técnico al guardar: {e}")
     else:
-        st.warning("⚠️ Verifique DNI/Nombre y acepte la declaración jurada.")
+        st.warning("⚠️ Asegúrese de completar Apellido, Nombre, DNI y aceptar la declaración jurada.")
